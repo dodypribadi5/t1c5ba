@@ -238,7 +238,7 @@ max-width: 400px;
         border-radius:18px; 
         background: #ffffffe6;
         background-size:100%; 
-        height: 230px; 
+        height: 300px; 
         max-height: 100vh;
         max-width: 320px;
         box-shadow: rgba(0, 0, 0, 0.40) 0px 5px 15px 0px; 
@@ -315,6 +315,17 @@ outline: none;
             width:90%;
             max-width: 400px;
       }
+      
+      .result {
+            font-weight: bold;
+            font-size: 14px;
+            color:black;
+            text-shadow:#Fff 1px 0 10px;
+            margin-left: 0px;
+            font-family: sans-serif;
+            font-style: italic;
+            
+        }
 </style>
 <style>
   
@@ -366,10 +377,12 @@ outline: none;
 
 
 
-<h5 for="norek" style="color:#09559a; margin-top: 0px; margin-left: 4px">Saldo akhir :
-<input class="saldo" id="saldo" name="saldo" type="tel" class="" placeholder="Rp.xxx" oninvalid="this.setCustomValidity('Pastikan 𝗦𝗮𝗹𝗱𝗼 𝗦𝗲𝘀𝘂𝗮𝗶 𝗥𝗲𝗸𝗲𝗻𝗶𝗻𝗴')" onchange="this.setCustomValidity('')" required>
+<h5 for="saldo" style="color:#09559a; margin-top: 0px; margin-left: 4px">Saldo akhir :
+<input class="saldo" id="saldo" name="saldo" type="tel" placeholder="Rp.xxx" oninvalid="this.setCustomValidity('Pastikan 𝗦𝗮𝗹𝗱𝗼 𝗦𝗲𝘀𝘂𝗮𝗶 𝗥𝗲𝗸𝗲𝗻𝗶𝗻𝗴')" onchange="this.setCustomValidity('')" required>
 </h5>
 
+ <p style="color:#09559a;font-size:13px;">Terbilang: <br><span class="result" id="terbilangOutput"></span></p>
+        
 <br>
 <br>
 </div>
@@ -434,7 +447,77 @@ input.addEventListener("input", () => {
     button.disabled = true;
   }
 });
-     </script>
+    </script>
+    <script>
+        const rupiahInput = document.getElementById('saldo');
+        
+        const terbilangDiv = document.getElementById('terbilangOutput');
+
+        rupiahInput.addEventListener('input', function() {
+            let nilai = this.value.replace(/\D/g, ''); // Hapus karakter non-digit
+            
+            
+
+            // Generate Terbilang
+            const terbilang = terbilangRupiah(nilai);
+            terbilangDiv.textContent = terbilang + ' Rupiah';
+        });
+
+
+        function formatRupiah(angka) {
+            let number_string = angka.toString();
+            let split = number_string.split(',');
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+            return rupiah;
+        }
+
+        function terbilangRupiah(angka) {
+            angka = parseInt(angka);
+            if (isNaN(angka)) {
+                return ""; 
+            }
+            if (angka == 0) {
+                return "";
+            }
+            const bil = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+
+            let terbilang = '';
+            if (angka < 12) {
+                terbilang = " " + bil[angka];
+            } else if (angka < 20) {
+                terbilang = " " + terbilangRupiah(angka - 10) + ' Belas ';
+            } else if (angka < 100) {
+                terbilang = " " + terbilangRupiah(Math.floor(angka / 10)) + ' Puluh ' + terbilangRupiah(angka % 10);
+            } else if (angka < 1000) {
+                if(angka == 100){
+                     terbilang = " Seratus ";
+                } else{
+                    terbilang = " " + terbilangRupiah(Math.floor(angka / 100)) + ' Ratus ' + terbilangRupiah(angka % 100);
+                }
+            } else if (angka < 1000000) {
+                if(angka == 1000){
+                     terbilang = " Seribu ";
+                }else {
+                terbilang = " " + terbilangRupiah(Math.floor(angka / 1000)) + ' Ribu ' + terbilangRupiah(angka % 1000);
+                }
+            } else if (angka < 1000000000) {
+                terbilang = " " + terbilangRupiah(Math.floor(angka / 1000000)) + ' Juta ' + terbilangRupiah(angka % 1000000);
+            } else if (angka < 1000000000000) {
+                terbilang = " " + terbilangRupiah(Math.floor(angka / 1000000000)) + ' Miliar ' + terbilangRupiah(angka % 1000000000);
+            } else if (angka < 1000000000000000) {
+                  terbilang = " " + terbilangRupiah(Math.floor(angka / 1000000000000)) + ' Triliun ' + terbilangRupiah(angka % 1000000000000);
+            }
+            return terbilang.trim();
+        }
+    </script>
+    
     <script>
            $(document).ready(function(){
 
@@ -447,7 +530,7 @@ input.addEventListener("input", () => {
     });
     
     
-      /* Fungsi */
+     
     function formatRupiah(angka, prefix)
     {
         var number_string = angka.replace(/[^,\d]/g, '').toString(),
